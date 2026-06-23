@@ -1,26 +1,26 @@
-# 📚 StudyVault
+# StudyVault
 
 StudyVault is a centralized platform where students can upload, organize, search, and share academic resources such as lecture notes, PDFs, previous-year question papers, assignments, and study materials.
 
 ---
 
-## 🚀 Project Overview
+## Project Overview
 
 Students often struggle to find reliable study resources in one place. StudyVault solves this problem by providing a secure and organized marketplace for educational content.
 
 ### ✨ Key Features
 
-* 📂 Upload and manage study materials
-* 🔍 Advanced search functionality
-* 📄 Support for PDFs, notes, and question papers
-* 👤 Secure user authentication using JWT
-* ☁️ Cloud-based file storage with Cloudinary
-* 📱 Responsive and user-friendly interface
-* 📚 Categorized academic resources
+* Upload and manage study materials
+* Advanced search functionality
+* Support for PDFs, notes, and question papers
+* Secure user authentication using JWT
+* Cloud-based file storage with Cloudinary
+* Responsive and user-friendly interface
+* Categorized academic resources
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Frontend
 
@@ -48,7 +48,7 @@ Students often struggle to find reliable study resources in one place. StudyVaul
 
 ---
 
-## 👥 Team Details
+## Team Details
 
 ### Team Name
 
