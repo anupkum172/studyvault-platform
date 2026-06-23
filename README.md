@@ -8,7 +8,7 @@ StudyVault is a centralized platform where students can upload, organize, search
 
 Students often struggle to find reliable study resources in one place. StudyVault solves this problem by providing a secure and organized marketplace for educational content.
 
-### ✨ Key Features
+### Key Features
 
 * Upload and manage study materials
 * Advanced search functionality
@@ -66,6 +66,6 @@ Students often struggle to find reliable study resources in one place. StudyVaul
 ---
 
 
-## 📜 License
+## License
 
 This project was developed for educational and academic purposes.
