@@ -1,31 +1,71 @@
-Project Name - StudyVault
+# 📚 StudyVault
 
-Theme - StudyVault (Notes and Resource Marketplace)
+StudyVault is a centralized platform where students can upload, organize, search, and share academic resources such as lecture notes, PDFs, previous-year question papers, assignments, and study materials.
 
-Team Name - The G.O.A.T
+---
 
-Team Members
-Anup Kumar yadav ANUPD2E5B4 ,
-Nitish yadav TECHF068FB ,
-Tej pratap yadav TECH418101 ,
-Mohit Kumar       TECHACBD2A
+## 🚀 Project Overview
 
-Project Overview
-StudyVault is a platform where students can upload, organize, search, and share academic resources such as notes, PDFs, and previous-year question papers.
+Students often struggle to find reliable study resources in one place. StudyVault solves this problem by providing a secure and organized marketplace for educational content.
 
-Tech Stack
-Frontend: React.js
-Backend: Node.js, Express.js
-Database: MongoDB
-Authentication: JWT
-Cloud Storage: Cloudinary
+### ✨ Key Features
 
-Setup Instructions
-Frontend
-cd frontend
-npm install
-npm start
-Backend
-cd backend
-npm install
-npm run dev
+* 📂 Upload and manage study materials
+* 🔍 Advanced search functionality
+* 📄 Support for PDFs, notes, and question papers
+* 👤 Secure user authentication using JWT
+* ☁️ Cloud-based file storage with Cloudinary
+* 📱 Responsive and user-friendly interface
+* 📚 Categorized academic resources
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+
+* React.js
+* HTML5
+* CSS3
+* JavaScript
+
+### Backend
+
+* Node.js
+* Express.js
+
+### Database
+
+* MongoDB
+
+### Authentication
+
+* JWT (JSON Web Tokens)
+
+### Cloud Storage
+
+* Cloudinary
+
+---
+
+## 👥 Team Details
+
+### Team Name
+
+**The G.O.A.T**
+
+### Team Members
+
+| Name             | ID         |
+| ---------------- | ---------- |
+| Anup Kumar Yadav | ANUPD2E5B4 |
+| Nitish Yadav     | TECHF068FB |
+| Tej Pratap Yadav | TECH418101 |
+| Mohit Kumar      | TECHACBD2A |
+
+---
+
+
+## 📜 License
+
+This project was developed for educational and academic purposes.
