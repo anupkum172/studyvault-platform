@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyVault - Centralized Academic Repository</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page-view { display: none; }
+        .page-view.active { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 implementation-mode">
+
+    <div id="page-auth" class="page-view active min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-blue-700 px-4">
+        <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full mb-3 text-2xl">
+                    <i class="fa-solid to-indigo-600 fa-vault"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900">StudyVault</h1>
+                <p class="text-gray-500 text-sm mt-1">Your centralized academic repository</p>
+            </div>
+
+            <div class="flex border-b border-gray-200 mb-6">
+                <button id="tab-login-btn" onclick="toggleAuthForm('login')" class="w-1/2 pb-3 text-center font-medium text-indigo-600 border-b-2 border-indigo-600">Login</button>
+                <button id="tab-register-btn" onclick="toggleAuthForm('register')" class="w-1/2 pb-3 text-center font-medium text-gray-400 border-b-2 border-transparent hover:text-gray-600">Register</button>
+            </div>
+
+            <form id="form-login" onsubmit="mockLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Student Email</label>
+                    <input type="email" required placeholder="alex@university.edu" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" required placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center text-gray-600"><input type="checkbox" class="mr-2 rounded"> Remember me</label>
+                    <a href="#" class="text-indigo-600 hover:underline">Forgot Password?</a>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition duration-200">Sign In</button>
+            </form>
+
+            <form id="form-register" onsubmit="mockLogin(event)" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" placeholder="Alex Johnson" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Student Email</label>
+                    <input type="email" placeholder="alex@university.edu" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Create Password</label>
+                    <input type="password" placeholder="••••••••" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div class="flex items-center text-sm text-gray-600">
+                    <input type="checkbox" required class="mr-2 rounded"> <span>I agree to the <a href="#" class="text-indigo-600 hover:underline">Terms of Service</a></span>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition duration-200">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="main-app" class="hidden min-h-screen flex flex-col md:flex-row">
+        
+        <aside class="w-full md:w-64 bg-indigo-900 text-white flex flex-col">
+            <div class="p-5 flex items-center gap-3 border-b border-indigo-800">
+                <i class="fa-solid fa-vault text-2xl text-indigo-400"></i>
+                <span class="text-xl font-bold tracking-wider">StudyVault</span>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="navigateTo('page-dashboard')" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-indigo-800 text-white font-medium text-left transition">
+                    <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+                </button>
+                <button onclick="navigateTo('page-search')" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white font-medium text-left transition">
+                    <i class="fa-solid fa-magnifying-glass w-5"></i> Search Resources
+                </button>
+                <button onclick="navigateTo('page-upload')" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white font-medium text-left transition">
+                    <i class="fa-solid fa-cloud-arrow-up w-5"></i> Upload Resource
+                </button>
+                <button onclick="navigateTo('page-profile')" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-white font-medium text-left transition">
+                    <i class="fa-solid fa-user w-5"></i> User Profile
+                </button>
+            </nav>
+            <div class="p-4 border-t border-indigo-800">
+                <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-red-300 hover:bg-red-900/30 transition text-left">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+
+            <section id="page-dashboard" class="page-view active space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">Welcome back, Alex!</h2>
+                        <p class="text-gray-500">Here is what's happening with your studies today.</p>
+                    </div>
+                    <button onclick="navigateTo('page-upload')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 shadow-sm transition">
+                        <i class="fa-solid fa-plus"></i> Upload New
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div class="p-3 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-file-lines text-xl"></i></div>
+                        <div><p class="text-sm text-gray-400 font-medium">Your Uploads</p><h3 class="text-2xl font-bold">14</h3></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div class="p-3 bg-green-50 text-green-600 rounded-lg"><i class="fa-solid fa-bookmark text-xl"></i></div>
+                        <div><p class="text-sm text-gray-400 font-medium">Saved Items</p><h3 class="text-2xl font-bold">29</h3></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div class="p-3 bg-purple-50 text-purple-600 rounded-lg"><i class="fa-solid fa-arrow-down text-xl"></i></div>
+                        <div><p class="text-sm text-gray-400 font-medium">Downloads</p><h3 class="text-2xl font-bold">112</h3></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div class="p-3 bg-amber-50 text-amber-600 rounded-lg"><i class="fa-solid fa-star text-xl"></i></div>
+                        <div><p class="text-sm text-gray-400 font-medium">Reputation Points</p><h3 class="text-2xl font-bold">450</h3></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Recently Accessed Materials</h3>
+                        <div class="divide-y divide-gray-100">
+                            <div class="py-3 flex items-center justify-between hover:bg-gray-50 px-2 rounded-lg transition">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-file-pdf text-red-500 text-xl"></i>
+                                    <div>
+                                        <p class="font-medium text-gray-800">Data Structures - Lecture 8 Notes</p>
+                                        <p class="text-xs text-gray-400">Computer Science • Uploaded by Prof. Miller</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-semibold bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">Lecture Notes</span>
+                            </div>
+                            <div class="py-3 flex items-center justify-between hover:bg-gray-50 px-2 rounded-lg transition">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-file-word text-blue-500 text-xl"></i>
+                                    <div>
+                                        <p class="font-medium text-gray-800">Discrete Math Midterm Prep Guide</p>
+                                        <p class="text-xs text-gray-400">Mathematics • Uploaded by Sarah K.</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-semibold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">Study Guide</span>
+                            </div>
+                            <div class="py-3 flex items-center justify-between hover:bg-gray-50 px-2 rounded-lg transition">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-file-code text-green-600 text-xl"></i>
+                                    <div>
+                                        <p class="font-medium text-gray-800">Database Systems Assignment 2 Solutions</p>
+                                        <p class="text-xs text-gray-400">Computer Science • Uploaded by You</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-semibold bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full">Assignments</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Trending Community Vaults</h3>
+                        <div class="space-y-4">
+                            <div class="p-3 bg-indigo-50/50 rounded-lg border border-indigo-100/50">
+                                <h4 class="font-semibold text-indigo-900 text-sm">Advanced AI Study Group</h4>
+                                <p class="text-xs text-indigo-700 mt-1">42 members • 18 resources added this week</p>
+                            </div>
+                            <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <h4 class="font-semibold text-gray-800 text-sm">Physics II Lab Reports Vault</h4>
+                                <p class="text-xs text-gray-500 mt-1">115 members • 3 files added today</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-search" class="page-view space-y-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900">Resource Repository</h2>
+                    <p class="text-gray-500">Search and filter community shared academic files.</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-3">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
+                        <input type="text" placeholder="Search by keywords, course code, topics (e.g., CS101, Calculus)..." class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div class="flex flex-wrap gap-3 items-center pt-2">
+                        <select class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">All Resource Types</option>
+                            <option value="notes">Lecture Notes</option>
+                            <option value="assignments">Assignments</option>
+                            <option value="papers">Question Papers</option>
+                            <option value="guides">Study Guides</option>
+                        </select>
+                        <select class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">All Departments</option>
+                            <option value="cs">Computer Science</option>
+                            <option value="math">Mathematics</option>
+                            <option value="physics">Physics</option>
+                            <option value="eng">Engineering</option>
+                        </select>
+                        <select class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="recent">Most Recent</option>
+                            <option value="popular">Most Popular</option>
+                            <option value="top-rated">Top Rated</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition flex flex-col justify-between">
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-xs font-semibold bg-red-100 text-red-700 px-2.5 py-1 rounded-full">Lecture Notes</span>
+                                <span class="text-xs text-gray-400"><i class="fa-solid fa-eye"></i> 245</span>
+                            </div>
+                            <h4 class="font-bold text-gray-800 text-lg mb-1">Operating Systems - Threading & Concurrency</h4>
+                            <p class="text-sm text-gray-500 line-clamp-2">Detailed handwritten summary for Unit 3. Includes race conditions, semaphores, and monitor patterns.</p>
+                            <div class="mt-4 flex items-center gap-2 text-xs text-gray-400 font-medium">
+                                <span>CS302</span>•<span>Prof. Stark</span>•<span>PDF (4.2 MB)</span>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 bg-indigo-500 rounded-full text-white text-[10px] flex items-center justify-center font-bold">EM</div>
+                                <span class="text-xs font-medium text-gray-600">Ethan M.</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="p-1.5 hover:bg-gray-200 text-gray-500 rounded" title="Save Resource"><i class="fa-regular fa-bookmark"></i></button>
+                                <button class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-medium flex items-center gap-1"><i class="fa-solid fa-download"></i> Get</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition flex flex-col justify-between">
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-xs font-semibold bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full">Question Papers</span>
+                                <span class="text-xs text-gray-400"><i class="fa-solid fa-eye"></i> 512</span>
+                            </div>
+                            <h4 class="font-bold text-gray-800 text-lg mb-1">Linear Algebra End-Semester Paper 2024</h4>
+                            <p class="text-sm text-gray-500 line-clamp-2">Original question paper with handwritten steps for solving vector spaces and eigenvalues questions.</p>
+                            <div class="mt-4 flex items-center gap-2 text-xs text-gray-400 font-medium">
+                                <span>MATH201</span>•<span>MATH Dept</span>•<span>PDF (1.8 MB)</span>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 bg-teal-500 rounded-full text-white text-[10px] flex items-center justify-center font-bold">LH</div>
+                                <span class="text-xs font-medium text-gray-600">Lana H.</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="p-1.5 hover:bg-gray-200 text-gray-500 rounded" title="Save Resource"><i class="fa-regular fa-bookmark"></i></button>
+                                <button class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-medium flex items-center gap-1"><i class="fa-solid fa-download"></i> Get</button>
+                            </div>
+                        </div>
+                    </div>
