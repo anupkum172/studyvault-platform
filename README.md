@@ -1,71 +1,106 @@
-# StudyVault
+# StudyVault Pro - Full Stack Academic Resource Repository
 
-StudyVault is a centralized platform where students can upload, organize, search, and share academic resources such as lecture notes, PDFs, previous-year question papers, assignments, and study materials.
+A polished full-stack StudyVault project with a modern React frontend and Express backend. It uses a local JSON database, so it runs without MongoDB.
 
----
+## Features
 
-## Project Overview
-
-Students often struggle to find reliable study resources in one place. StudyVault solves this problem by providing a secure and organized marketplace for educational content.
-
-### Key Features
-
-* Upload and manage study materials
-* Advanced search functionality
-* Support for PDFs, notes, and question papers
-* Secure user authentication using JWT
-* Cloud-based file storage with Cloudinary
-* Responsive and user-friendly interface
-* Categorized academic resources
-
----
+- User registration and login
+- JWT authentication
+- Upload academic resources with files
+- Download uploaded files
+- Search resources by keyword
+- Filter by semester, subject, type, and branch
+- Edit and delete your own uploads
+- Dashboard with stats
+- User profile update
+- Professional responsive UI
 
 ## Tech Stack
 
-### Frontend
+Frontend: React, Vite, Tailwind CSS, Lucide React, Axios, React Router
+Backend: Node.js, Express.js, JWT, bcryptjs, multer, local JSON database
 
-* React.js
-* HTML5
-* CSS3
-* JavaScript
+## Folder Structure
 
-### Backend
+```
+studyvault-pro/
+  backend/
+  frontend/
+  package.json
+  README.md
+```
 
-* Node.js
-* Express.js
+## How to Run
 
-### Database
+### 1. Install Node.js
+Install Node.js LTS from nodejs.org. Restart VS Code after installation.
 
-* MongoDB
+### 2. Open Project
+Open VS Code, then open the `studyvault-pro` folder.
 
-### Authentication
+### 3. Install Dependencies
+Open a terminal in the main `studyvault-pro` folder:
 
-* JWT (JSON Web Tokens)
+```bash
+npm install
+npm run install-all
+```
 
-### Cloud Storage
+### 4. Start the Website
 
-* Cloudinary
+```bash
+npm run dev
+```
 
----
+This starts both apps:
 
-## Team Details
+```txt
+Frontend: http://localhost:5273
+Backend:  http://localhost:5000
+```
 
-### Team Name
+### Alternative: Run in Two Terminals
 
-**The G.O.A.T**
+Terminal 1:
 
-### Team Members
+```bash
+cd backend
+npm install
+npm run dev
+```
 
-| Name             | ID         |
-| ---------------- | ---------- |
-| Anup Kumar Yadav | ANUPD2E5B4 |
-| Nitish Yadav     | TECHF068FB |
-| Tej Pratap Yadav | TECH418101 |
-| Mohit Kumar      | TECHACBD2A |
+Terminal 2:
 
----
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
+Then open:
 
-## License
+```txt
+http://localhost:5273
+```
 
-This project was developed for educational and academic purposes.
+## Demo Flow
+
+1. Register a new account.
+2. Login.
+3. Upload a PDF/image/document resource.
+4. Search and filter resources.
+5. Download files.
+6. Edit/delete your own uploads.
+7. Update profile.
+
+## Environment Variables
+
+Backend already includes `.env.example`. Create `.env` in backend if needed:
+
+```env
+PORT=5000
+JWT_SECRET=studyvault_super_secret_key_change_later
+CLIENT_URL=http://localhost:5273
+```
+
+No MongoDB required.
