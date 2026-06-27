@@ -2,14 +2,17 @@ import multer from 'multer';
 import path from 'path';
 import { nanoid } from 'nanoid';
 import { uploadDir } from '../utils/paths.js';
+import { hasCloudinary } from '../utils/cloudinary.js';
 
-const storage = multer.diskStorage({
+const diskStorage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, uploadDir),
   filename: (_req, file, cb) => {
     const safeName = file.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_');
     cb(null, `${Date.now()}-${nanoid(6)}-${safeName}`);
   }
 });
+
+const storage = hasCloudinary ? multer.memoryStorage() : diskStorage;
 
 const allowedTypes = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.txt', '.png', '.jpg', '.jpeg'];
 

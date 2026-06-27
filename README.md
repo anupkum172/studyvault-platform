@@ -105,23 +105,31 @@ CLIENT_URL=http://localhost:5273
 
 No MongoDB required.
 
-## Deploy Frontend on Vercel
+## Deploy on Vercel
 
-This repository includes `vercel.json`, so Vercel can build the React frontend from the repo root.
+This repository includes `vercel.json` for Vercel Services. It deploys:
 
-Vercel settings:
+- `frontend` as the Vite web app at `/`
+- `backend` as the Express API at `/_/backend`
 
-```txt
-Framework Preset: Vite
-Install Command: cd frontend && npm install
-Build Command: cd frontend && npm run build
-Output Directory: frontend/dist
-```
+The frontend automatically calls the backend route in production. Set `VITE_API_URL` only if you deploy the backend somewhere else.
 
-Add this environment variable in Vercel:
+## Production Storage
+
+For production deployment, set these environment variables in Vercel:
 
 ```env
-VITE_API_URL=https://your-backend-url.com
+JWT_SECRET=use_a_long_random_secret
+MONGODB_URI=mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/studyvault
+MONGODB_DB=studyvault
 ```
 
-Important: the current backend uses Express, local JSON storage, and local file uploads. Deploy the backend on a service with persistent storage such as Render, Railway, or a VPS, then put that backend URL in `VITE_API_URL`.
+For persistent file uploads, also add Cloudinary credentials:
+
+```env
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+Without `MONGODB_URI`, the backend falls back to local JSON storage for development. On Vercel, that fallback is temporary and should only be used for quick testing.

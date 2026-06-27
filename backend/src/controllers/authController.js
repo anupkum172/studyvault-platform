@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
-import { readDB, writeDB } from '../utils/db.js';
+import { createUser, findUserByEmail, findUserById, updateUser } from '../utils/store.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'studyvault_dev_secret_change_me';
 
@@ -19,8 +19,7 @@ export async function register(req, res) {
   if (!name || !email || !password) return res.status(400).json({ message: 'Name, email and password are required.' });
   if (password.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters.' });
 
-  const db = await readDB();
-  const exists = db.users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+  const exists = await findUserByEmail(email);
   if (exists) return res.status(409).json({ message: 'Email already registered.' });
 
   const user = {
@@ -34,15 +33,13 @@ export async function register(req, res) {
     createdAt: new Date().toISOString()
   };
 
-  db.users.push(user);
-  await writeDB(db);
-  res.status(201).json({ user: publicUser(user), token: createToken(user.id) });
+  const createdUser = await createUser(user);
+  res.status(201).json({ user: publicUser(createdUser), token: createToken(createdUser.id) });
 }
 
 export async function login(req, res) {
   const { email, password } = req.body;
-  const db = await readDB();
-  const user = db.users.find((u) => u.email.toLowerCase() === String(email).toLowerCase());
+  const user = await findUserByEmail(email);
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return res.status(401).json({ message: 'Invalid email or password.' });
   }
@@ -50,20 +47,20 @@ export async function login(req, res) {
 }
 
 export async function me(req, res) {
-  const db = await readDB();
-  const user = db.users.find((u) => u.id === req.user.id);
+  const user = await findUserById(req.user.id);
+  if (!user) return res.status(404).json({ message: 'User not found.' });
   res.json({ user: publicUser(user) });
 }
 
 export async function updateProfile(req, res) {
   const { name, branch, semester, bio } = req.body;
-  const db = await readDB();
-  const user = db.users.find((u) => u.id === req.user.id);
+  const user = await findUserById(req.user.id);
   if (!user) return res.status(404).json({ message: 'User not found.' });
-  user.name = name || user.name;
-  user.branch = branch || user.branch;
-  user.semester = semester || user.semester;
-  user.bio = bio ?? user.bio;
-  await writeDB(db);
-  res.json({ user: publicUser(user) });
+  const updatedUser = await updateUser(req.user.id, {
+    name: name || user.name,
+    branch: branch || user.branch,
+    semester: semester || user.semester,
+    bio: bio ?? user.bio
+  });
+  res.json({ user: publicUser(updatedUser) });
 }

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { readDB } from '../utils/db.js';
+import { findUserById } from '../utils/store.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'studyvault_dev_secret_change_me';
 
@@ -12,8 +12,7 @@ export async function protect(req, res, next) {
 
     const token = header.split(' ')[1];
     const decoded = jwt.verify(token, JWT_SECRET);
-    const db = await readDB();
-    const user = db.users.find((u) => u.id === decoded.id);
+    const user = await findUserById(decoded.id);
 
     if (!user) return res.status(401).json({ message: 'User not found.' });
 

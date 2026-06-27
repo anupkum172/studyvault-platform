@@ -49,4 +49,8 @@ app.use((err, _req, res, _next) => {
   res.status(400).json({ message: err.message || 'Something went wrong.' });
 });
 
-app.listen(PORT, () => console.log(`StudyVault backend running on http://localhost:${PORT}`));
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => console.log(`StudyVault backend running on http://localhost:${PORT}`));
+}
+
+export default app;
