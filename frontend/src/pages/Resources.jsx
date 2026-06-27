@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Download, FileText, Pencil, Search, SlidersHorizontal, Trash2, X } from 'lucide-react';
-import api, { API_URL } from '../lib/api';
+import api from '../lib/api';
 
 const typeOptions = [
   ['notes', 'Notes'],
@@ -14,6 +14,7 @@ export default function Resources() {
   const [filters, setFilters] = useState({ q: '', semester: '', subject: '', type: '', branch: '' });
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const load = async (nextFilters = filters) => {
     setLoading(true);
@@ -41,6 +42,33 @@ export default function Resources() {
     if (confirm('Delete this resource?')) {
       await api.delete(`/resources/${id}`);
       load();
+    }
+  };
+
+  const download = async (resource) => {
+    setError('');
+    try {
+      const response = await api.get(`/resources/${resource.id}/download`, { responseType: 'blob' });
+      const blobUrl = URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = resource.originalName || resource.title || 'studyvault-resource';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(blobUrl);
+      load();
+    } catch (err) {
+      if (err.response?.data instanceof Blob) {
+        const text = await err.response.data.text();
+        try {
+          setError(JSON.parse(text).message || 'Download failed.');
+        } catch {
+          setError(text || 'Download failed.');
+        }
+      } else {
+        setError(err.response?.data?.message || 'Download failed.');
+      }
     }
   };
 
@@ -112,6 +140,8 @@ export default function Resources() {
         </button>
       </form>
 
+      {error && <p className="rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>}
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((resource) => (
           <article key={resource.id} className="card flex min-h-[310px] flex-col p-5">
@@ -137,10 +167,10 @@ export default function Resources() {
             </div>
 
             <div className="mt-5 flex gap-2">
-              <a className="btn-primary flex-1 py-2.5" href={`${API_URL}/api/resources/${resource.id}/download`}>
+              <button type="button" className="btn-primary flex-1 py-2.5" onClick={() => download(resource)}>
                 <Download size={17} />
                 Download
-              </a>
+              </button>
               {resource.isOwner && (
                 <>
                   <button onClick={() => setEditing(resource)} className="btn-secondary px-3 py-2.5" aria-label="Edit resource">

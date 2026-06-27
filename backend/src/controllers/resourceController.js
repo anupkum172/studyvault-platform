@@ -96,7 +96,15 @@ export async function downloadResource(req, res) {
   const resource = await findResourceById(req.params.id);
   if (!resource) return res.status(404).json({ message: 'Resource not found.' });
   await updateResourceRecord(req.params.id, { downloads: resource.downloads + 1 });
-  if (resource.fileUrl) return res.redirect(resource.fileUrl);
+  if (resource.fileUrl) {
+    const fileResponse = await fetch(resource.fileUrl);
+    if (!fileResponse.ok) {
+      return res.status(502).json({ message: 'Could not fetch file from Cloudinary. Please try again.' });
+    }
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(resource.originalName)}"`);
+    res.setHeader('Content-Type', fileResponse.headers.get('content-type') || 'application/octet-stream');
+    return res.send(Buffer.from(await fileResponse.arrayBuffer()));
+  }
   const filePath = path.resolve(uploadDir, resource.fileName);
   try {
     await fs.access(filePath);
