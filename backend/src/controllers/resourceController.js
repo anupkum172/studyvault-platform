@@ -30,7 +30,13 @@ export async function createResource(req, res) {
 
   let cloudinaryFile = null;
   if (hasCloudinary) {
-    cloudinaryFile = await uploadBuffer(req.file.buffer, req.file.originalname);
+    try {
+      cloudinaryFile = await uploadBuffer(req.file.buffer, req.file.originalname);
+    } catch (error) {
+      return res.status(502).json({
+        message: `Cloudinary upload failed: ${error.message}. Check CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET.`
+      });
+    }
   }
 
   const resource = {

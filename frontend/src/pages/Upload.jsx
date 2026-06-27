@@ -30,7 +30,17 @@ export default function Upload() {
       await api.post('/resources', data, { headers: { 'Content-Type': 'multipart/form-data' } });
       navigate('/resources');
     } catch (err) {
-      setError(err.response?.data?.message || 'Upload failed');
+      if (err.code === 'ECONNABORTED') {
+        setError('Upload timed out. Try a smaller file, or check Cloudinary and Vercel function logs.');
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.response?.status === 413) {
+        setError('File is too large for the deployment. Try a smaller file.');
+      } else if (!err.response) {
+        setError('Could not reach the upload API. Check that the backend service deployed successfully.');
+      } else {
+        setError(`Upload failed with status ${err.response.status}.`);
+      }
     } finally {
       setSubmitting(false);
     }

@@ -69,6 +69,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/resources', resourceRoutes);
 
 app.use((err, _req, res, _next) => {
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ message: 'File is too large. Upload a file under 20 MB.' });
+  }
   const status = err.statusCode || 400;
   res.status(status).json({ message: err.message || 'Something went wrong.' });
 });
