@@ -6,6 +6,7 @@ import authRoutes from './routes/authRoutes.js';
 import resourceRoutes from './routes/resourceRoutes.js';
 import { ensureDB } from './utils/db.js';
 import { uploadDir } from './utils/paths.js';
+import { connectMongo, hasMongo } from './utils/mongo.js';
 
 dotenv.config();
 
@@ -42,16 +43,24 @@ app.use(express.json());
 app.use('/uploads', express.static(uploadDir));
 
 app.get('/', (_req, res) => res.json({ message: 'StudyVault API is running' }));
-app.get('/api/health', (_req, res) => res.json({
-  ok: true,
-  storage: process.env.MONGODB_URI ? 'mongodb' : 'local-json',
-  uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : 'local'
-}));
+app.get('/api/health', async (_req, res) => {
+  if (!hasMongo) {
+    return res.json({ ok: true, storage: 'local-json', database: 'not-configured', uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : 'local' });
+  }
+
+  try {
+    await connectMongo();
+    return res.json({ ok: true, storage: 'mongodb', database: 'connected', uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : 'local' });
+  } catch (error) {
+    return res.status(503).json({ ok: false, storage: 'mongodb', database: 'connection-failed', message: error.message });
+  }
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/resources', resourceRoutes);
 
 app.use((err, _req, res, _next) => {
-  res.status(400).json({ message: err.message || 'Something went wrong.' });
+  const status = err.statusCode || 400;
+  res.status(status).json({ message: err.message || 'Something went wrong.' });
 });
 
 if (!process.env.VERCEL) {
