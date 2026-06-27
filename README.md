@@ -104,3 +104,24 @@ CLIENT_URL=http://localhost:5273
 ```
 
 No MongoDB required.
+
+## Deploy Frontend on Vercel
+
+This repository includes `vercel.json`, so Vercel can build the React frontend from the repo root.
+
+Vercel settings:
+
+```txt
+Framework Preset: Vite
+Install Command: cd frontend && npm install
+Build Command: cd frontend && npm run build
+Output Directory: frontend/dist
+```
+
+Add this environment variable in Vercel:
+
+```env
+VITE_API_URL=https://your-backend-url.com
+```
+
+Important: the current backend uses Express, local JSON storage, and local file uploads. Deploy the backend on a service with persistent storage such as Render, Railway, or a VPS, then put that backend URL in `VITE_API_URL`.
