@@ -2,7 +2,10 @@ import axios from 'axios';
 
 export const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/_/backend' : 'http://localhost:5000');
 
-const api = axios.create({ baseURL: `${API_URL}/api` });
+const api = axios.create({
+  baseURL: `${API_URL}/api`,
+  timeout: 20000
+});
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('studyvault_token');

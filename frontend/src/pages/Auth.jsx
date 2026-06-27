@@ -14,6 +14,7 @@ export default function Auth() {
   const navigate = useNavigate();
   const [mode, setMode] = useState('login');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -27,6 +28,7 @@ export default function Auth() {
   const submit = async (event) => {
     event.preventDefault();
     setError('');
+    setSubmitting(true);
 
     try {
       if (mode === 'login') {
@@ -36,7 +38,15 @@ export default function Auth() {
       }
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong');
+      if (err.code === 'ECONNABORTED') {
+        setError('The server took too long to respond. Please check your deployment logs and try again.');
+      } else if (!err.response) {
+        setError('Could not reach the backend API. Check that the Vercel backend service deployed successfully.');
+      } else {
+        setError(err.response?.data?.message || `Request failed with status ${err.response.status}.`);
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -86,14 +96,14 @@ export default function Auth() {
             <div className="mb-5 grid grid-cols-2 rounded-lg bg-slate-100 p-1">
               <button
                 type="button"
-                onClick={() => setMode('login')}
+                onClick={() => { setMode('login'); setError(''); }}
                 className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'login' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}
               >
                 Login
               </button>
               <button
                 type="button"
-                onClick={() => setMode('register')}
+                onClick={() => { setMode('register'); setError(''); }}
                 className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'register' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}
               >
                 Register
@@ -152,7 +162,9 @@ export default function Auth() {
                   </select>
                 </div>
               )}
-              <button className="btn-primary w-full">{mode === 'login' ? 'Sign In' : 'Create Account'}</button>
+              <button className="btn-primary w-full" disabled={submitting}>
+                {submitting ? (mode === 'login' ? 'Signing in...' : 'Creating account...') : (mode === 'login' ? 'Sign In' : 'Create Account')}
+              </button>
             </div>
           </form>
         </section>

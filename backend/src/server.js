@@ -42,6 +42,11 @@ app.use(express.json());
 app.use('/uploads', express.static(uploadDir));
 
 app.get('/', (_req, res) => res.json({ message: 'StudyVault API is running' }));
+app.get('/api/health', (_req, res) => res.json({
+  ok: true,
+  storage: process.env.MONGODB_URI ? 'mongodb' : 'local-json',
+  uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : 'local'
+}));
 app.use('/api/auth', authRoutes);
 app.use('/api/resources', resourceRoutes);
 
