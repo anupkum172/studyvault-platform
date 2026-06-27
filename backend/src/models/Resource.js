@@ -15,6 +15,7 @@ const resourceSchema = new mongoose.Schema({
   fileUrl: { type: String, default: '' },
   storageProvider: { type: String, default: 'local' },
   publicId: { type: String, default: '' },
+  resourceType: { type: String, default: '' },
   ownerId: { type: String, required: true, index: true },
   ownerName: { type: String, required: true },
   downloads: { type: Number, default: 0 },

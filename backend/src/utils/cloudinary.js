@@ -21,7 +21,7 @@ export function uploadBuffer(buffer, originalName) {
     const upload = cloudinary.uploader.upload_stream(
       {
         folder: 'studyvault',
-        resource_type: 'auto',
+        resource_type: 'raw',
         use_filename: true,
         unique_filename: true,
         filename_override: originalName
@@ -33,6 +33,21 @@ export function uploadBuffer(buffer, originalName) {
     );
 
     upload.end(buffer);
+  });
+}
+
+export function getCloudinaryDownloadUrl(resource) {
+  if (!hasCloudinary || !resource?.publicId) return resource?.fileUrl || '';
+
+  const extension = resource.originalName?.includes('.')
+    ? resource.originalName.split('.').pop()
+    : undefined;
+
+  return cloudinary.utils.private_download_url(resource.publicId, extension, {
+    resource_type: resource.resourceType || 'raw',
+    type: 'upload',
+    attachment: true,
+    expires_at: Math.floor(Date.now() / 1000) + 300
   });
 }
 

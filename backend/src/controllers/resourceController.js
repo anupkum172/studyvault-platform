@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { nanoid } from 'nanoid';
 import { uploadDir } from '../utils/paths.js';
-import { deleteCloudinaryFile, hasCloudinary, uploadBuffer } from '../utils/cloudinary.js';
+import { deleteCloudinaryFile, getCloudinaryDownloadUrl, hasCloudinary, uploadBuffer } from '../utils/cloudinary.js';
 import {
   createResourceRecord,
   deleteResourceRecord,
@@ -54,6 +54,7 @@ export async function createResource(req, res) {
     fileUrl: cloudinaryFile?.secure_url || '',
     storageProvider: cloudinaryFile ? 'cloudinary' : 'local',
     publicId: cloudinaryFile?.public_id || '',
+    resourceType: cloudinaryFile?.resource_type || '',
     ownerId: req.user.id,
     ownerName: req.user.name,
     downloads: 0,
@@ -96,10 +97,13 @@ export async function downloadResource(req, res) {
   const resource = await findResourceById(req.params.id);
   if (!resource) return res.status(404).json({ message: 'Resource not found.' });
   await updateResourceRecord(req.params.id, { downloads: resource.downloads + 1 });
-  if (resource.fileUrl) {
-    const fileResponse = await fetch(resource.fileUrl);
+  if (resource.fileUrl || resource.publicId) {
+    const downloadUrl = getCloudinaryDownloadUrl(resource);
+    const fileResponse = await fetch(downloadUrl);
     if (!fileResponse.ok) {
-      return res.status(502).json({ message: 'Could not fetch file from Cloudinary. Please try again.' });
+      return res.status(502).json({
+        message: 'Could not fetch file from Cloudinary. Reupload this file after the latest deployment, and make sure PDF/raw file delivery is enabled in Cloudinary.'
+      });
     }
     res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(resource.originalName)}"`);
     res.setHeader('Content-Type', fileResponse.headers.get('content-type') || 'application/octet-stream');
