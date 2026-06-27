@@ -133,3 +133,5 @@ CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 Without `MONGODB_URI`, the backend falls back to local JSON storage for development. On Vercel, that fallback is temporary and should only be used for quick testing.
+
+Cloudinary is required for uploads on Vercel. If Cloudinary is not configured, uploads are blocked because Vercel local file storage is temporary and downloads can break.

@@ -23,6 +23,9 @@ export async function createResource(req, res) {
   if (!title || !subject || !semester || !branch || !type) {
     return res.status(400).json({ message: 'Title, subject, semester, branch and type are required.' });
   }
+  if (process.env.VERCEL && !hasCloudinary) {
+    return res.status(503).json({ message: 'Uploads need Cloudinary on Vercel. Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET, then redeploy.' });
+  }
   if (!req.file) return res.status(400).json({ message: 'File is required.' });
 
   let cloudinaryFile = null;
@@ -88,7 +91,15 @@ export async function downloadResource(req, res) {
   if (!resource) return res.status(404).json({ message: 'Resource not found.' });
   await updateResourceRecord(req.params.id, { downloads: resource.downloads + 1 });
   if (resource.fileUrl) return res.redirect(resource.fileUrl);
-  res.download(path.resolve(uploadDir, resource.fileName), resource.originalName);
+  const filePath = path.resolve(uploadDir, resource.fileName);
+  try {
+    await fs.access(filePath);
+  } catch {
+    return res.status(410).json({
+      message: 'This file is no longer available. Vercel local upload storage is temporary. Configure Cloudinary and upload the document again.'
+    });
+  }
+  return res.download(filePath, resource.originalName);
 }
 
 export async function dashboard(req, res) {

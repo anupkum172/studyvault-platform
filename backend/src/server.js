@@ -45,12 +45,22 @@ app.use('/uploads', express.static(uploadDir));
 app.get('/', (_req, res) => res.json({ message: 'StudyVault API is running' }));
 app.get('/api/health', async (_req, res) => {
   if (!hasMongo) {
-    return res.json({ ok: true, storage: 'local-json', database: 'not-configured', uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : 'local' });
+    return res.json({
+      ok: true,
+      storage: 'local-json',
+      database: 'not-configured',
+      uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : (process.env.VERCEL ? 'cloudinary-required' : 'local')
+    });
   }
 
   try {
     await connectMongo();
-    return res.json({ ok: true, storage: 'mongodb', database: 'connected', uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : 'local' });
+    return res.json({
+      ok: true,
+      storage: 'mongodb',
+      database: 'connected',
+      uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : (process.env.VERCEL ? 'cloudinary-required' : 'local')
+    });
   } catch (error) {
     return res.status(503).json({ ok: false, storage: 'mongodb', database: 'connection-failed', message: error.message });
   }
