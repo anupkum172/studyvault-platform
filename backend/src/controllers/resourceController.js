@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { nanoid } from 'nanoid';
 import { readDB, writeDB } from '../utils/db.js';
+import { uploadDir } from '../utils/paths.js';
 
 export async function getResources(req, res) {
   const { q = '', semester = '', subject = '', type = '', branch = '' } = req.query;
@@ -77,7 +78,7 @@ export async function deleteResource(req, res) {
 
   db.resources.splice(index, 1);
   await writeDB(db);
-  try { await fs.unlink(path.join('uploads', resource.fileName)); } catch {}
+  try { await fs.unlink(path.join(uploadDir, resource.fileName)); } catch {}
   res.json({ message: 'Resource deleted successfully.' });
 }
 
@@ -87,7 +88,7 @@ export async function downloadResource(req, res) {
   if (!resource) return res.status(404).json({ message: 'Resource not found.' });
   resource.downloads += 1;
   await writeDB(db);
-  res.download(path.resolve('uploads', resource.fileName), resource.originalName);
+  res.download(path.resolve(uploadDir, resource.fileName), resource.originalName);
 }
 
 export async function dashboard(req, res) {
