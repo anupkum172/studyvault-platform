@@ -4,9 +4,9 @@
 
 | Member           | Responsibility                                               |
 | ---------------- | ------------------------------------------------------------ |
-| Anup Kumar Yadav | Project Setup, Repository Management, Frontend Development   |
+| Anup Kumar Yadav | Backend API Development, Authentication Module               |
 | Nitish Yadav     | Product Requirement Document (PRD), Documentation, UI Design |
-| Tej Pratap Yadav | Backend API Development, Authentication Module               |
+| Tej Pratap Yadav | Project Setup, Repository Management            |
 | Mohit Kumar      | Database Design, Resource Upload Module, Testing             |
 
 ---
