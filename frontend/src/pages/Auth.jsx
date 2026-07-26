@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { BookOpen, FileSearch, Lock, Mail, UploadCloud, User } from 'lucide-react';
+import { BookOpen, FileSearch, KeyRound, Lock, Mail, UploadCloud, User } from 'lucide-react';
 import { useAuth } from '../main';
+import api from '../lib/api';
 
 const highlights = [
   ['Curate', 'Upload trusted class material with useful metadata.', UploadCloud],
@@ -14,6 +15,8 @@ export default function Auth() {
   const navigate = useNavigate();
   const [mode, setMode] = useState('login');
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [resetCode, setResetCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: '',
@@ -28,15 +31,32 @@ export default function Auth() {
   const submit = async (event) => {
     event.preventDefault();
     setError('');
+    setNotice('');
     setSubmitting(true);
 
     try {
       if (mode === 'login') {
         await login({ email: form.email, password: form.password });
-      } else {
+        navigate('/');
+      } else if (mode === 'register') {
         await register(form);
+        navigate('/');
+      } else if (mode === 'forgot') {
+        const response = await api.post('/auth/forgot-password', { email: form.email });
+        setResetCode(response.data.resetCode || '');
+        setNotice(response.data.message || 'Reset code generated.');
+        setMode('reset');
+      } else if (mode === 'reset') {
+        const response = await api.post('/auth/reset-password', {
+          email: form.email,
+          code: form.resetCode,
+          password: form.password
+        });
+        setNotice(response.data.message || 'Password updated successfully.');
+        setResetCode('');
+        setMode('login');
+        setForm({ ...form, password: '', resetCode: '' });
       }
-      navigate('/');
     } catch (err) {
       if (err.code === 'ECONNABORTED') {
         setError('The server took too long to respond. Please check your deployment logs and try again.');
@@ -88,22 +108,27 @@ export default function Auth() {
           <form onSubmit={submit} className="mx-auto w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-6">
               <h2 className="text-2xl font-bold tracking-tight text-slate-950">
-                {mode === 'login' ? 'Welcome back' : 'Create your account'}
+                {mode === 'login' && 'Welcome back'}
+                {mode === 'register' && 'Create your account'}
+                {mode === 'forgot' && 'Reset your password'}
+                {mode === 'reset' && 'Enter reset code'}
               </h2>
-              <p className="mt-1 text-sm text-slate-500">Access your academic vault.</p>
+              <p className="mt-1 text-sm text-slate-500">
+                {mode === 'forgot' || mode === 'reset' ? 'Recover access to your academic vault.' : 'Access your academic vault.'}
+              </p>
             </div>
 
             <div className="mb-5 grid grid-cols-2 rounded-lg bg-slate-100 p-1">
               <button
                 type="button"
-                onClick={() => { setMode('login'); setError(''); }}
+                onClick={() => { setMode('login'); setError(''); setNotice(''); setResetCode(''); }}
                 className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'login' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}
               >
                 Login
               </button>
               <button
                 type="button"
-                onClick={() => { setMode('register'); setError(''); }}
+                onClick={() => { setMode('register'); setError(''); setNotice(''); setResetCode(''); }}
                 className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'register' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}
               >
                 Register
@@ -111,6 +136,13 @@ export default function Auth() {
             </div>
 
             {error && <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>}
+            {notice && <p className="mb-4 rounded-lg bg-teal-50 p-3 text-sm font-semibold text-teal-700">{notice}</p>}
+            {resetCode && (
+              <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Demo reset code</p>
+                <p className="mt-1 text-2xl font-bold tracking-widest text-amber-950">{resetCode}</p>
+              </div>
+            )}
 
             <div className="space-y-4">
               {mode === 'register' && (
@@ -136,17 +168,31 @@ export default function Auth() {
                   onChange={(event) => setForm({ ...form, email: event.target.value })}
                 />
               </label>
-              <label className="relative block">
-                <Lock className="pointer-events-none absolute left-3.5 top-3.5 text-slate-400" size={18} />
-                <input
-                  className="input-icon"
-                  type="password"
-                  required
-                  placeholder="Password, minimum 6 characters"
-                  value={form.password}
-                  onChange={(event) => setForm({ ...form, password: event.target.value })}
-                />
-              </label>
+              {mode === 'reset' && (
+                <label className="relative block">
+                  <KeyRound className="pointer-events-none absolute left-3.5 top-3.5 text-slate-400" size={18} />
+                  <input
+                    className="input-icon"
+                    required
+                    placeholder="6-digit reset code"
+                    value={form.resetCode || ''}
+                    onChange={(event) => setForm({ ...form, resetCode: event.target.value })}
+                  />
+                </label>
+              )}
+              {mode !== 'forgot' && (
+                <label className="relative block">
+                  <Lock className="pointer-events-none absolute left-3.5 top-3.5 text-slate-400" size={18} />
+                  <input
+                    className="input-icon"
+                    type="password"
+                    required
+                    placeholder={mode === 'reset' ? 'New password, minimum 6 characters' : 'Password, minimum 6 characters'}
+                    value={form.password}
+                    onChange={(event) => setForm({ ...form, password: event.target.value })}
+                  />
+                </label>
+              )}
               {mode === 'register' && (
                 <div className="grid grid-cols-2 gap-3">
                   <input
@@ -163,8 +209,33 @@ export default function Auth() {
                 </div>
               )}
               <button className="btn-primary w-full" disabled={submitting}>
-                {submitting ? (mode === 'login' ? 'Signing in...' : 'Creating account...') : (mode === 'login' ? 'Sign In' : 'Create Account')}
+                {submitting && mode === 'login' && 'Signing in...'}
+                {submitting && mode === 'register' && 'Creating account...'}
+                {submitting && mode === 'forgot' && 'Generating code...'}
+                {submitting && mode === 'reset' && 'Updating password...'}
+                {!submitting && mode === 'login' && 'Sign In'}
+                {!submitting && mode === 'register' && 'Create Account'}
+                {!submitting && mode === 'forgot' && 'Get Reset Code'}
+                {!submitting && mode === 'reset' && 'Update Password'}
               </button>
+              {mode === 'login' && (
+                <button
+                  type="button"
+                  onClick={() => { setMode('forgot'); setError(''); setNotice(''); setResetCode(''); }}
+                  className="w-full text-center text-sm font-semibold text-teal-700 hover:text-teal-800"
+                >
+                  Forgot password?
+                </button>
+              )}
+              {(mode === 'forgot' || mode === 'reset') && (
+                <button
+                  type="button"
+                  onClick={() => { setMode('login'); setError(''); setNotice(''); setResetCode(''); }}
+                  className="btn-secondary w-full"
+                >
+                  Back to Login
+                </button>
+              )}
             </div>
           </form>
         </section>

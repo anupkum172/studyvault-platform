@@ -5,6 +5,7 @@ A polished full-stack StudyVault project with a modern React frontend and Expres
 ## Features
 
 - User registration and login
+- Forgot password flow with temporary reset code
 - JWT authentication
 - Upload academic resources with files
 - Preview selected PDF/image files before submitting upload
@@ -91,12 +92,13 @@ http://localhost:5273
 
 1. Register a new account.
 2. Login.
-3. Upload a PDF/image/document resource.
-4. Admin approves the pending upload.
-5. Search and filter approved resources.
-6. Download files.
-7. Edit/delete your own uploads.
-8. Update profile.
+3. Use forgot password if you need to reset access.
+4. Upload a PDF/image/document resource.
+5. Admin approves the pending upload.
+6. Search and filter approved resources.
+7. Download files.
+8. Edit/delete your own uploads.
+9. Update profile.
 
 ## Environment Variables
 

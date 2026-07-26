@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
 import { createUser, findUserByEmail, findUserById, updateUser } from '../utils/store.js';
@@ -11,8 +12,12 @@ function createToken(id) {
 }
 
 function publicUser(user) {
-  const { password, ...safeUser } = user;
+  const { password, resetCodeHash, resetCodeExpiresAt, ...safeUser } = user;
   return { ...safeUser, role: resolveRole(user) };
+}
+
+function createResetCode() {
+  return crypto.randomInt(100000, 999999).toString();
 }
 
 export async function register(req, res) {
@@ -46,6 +51,54 @@ export async function login(req, res) {
     return res.status(401).json({ message: 'Invalid email or password.' });
   }
   res.json({ user: publicUser(user), token: createToken(user.id) });
+}
+
+export async function requestPasswordReset(req, res) {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: 'Email is required.' });
+
+  const user = await findUserByEmail(email);
+  if (!user) {
+    return res.json({ message: 'If this email exists, a reset code has been generated.' });
+  }
+
+  const resetCode = createResetCode();
+  await updateUser(user.id, {
+    resetCodeHash: await bcrypt.hash(resetCode, 10),
+    resetCodeExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString()
+  });
+
+  res.json({
+    message: 'Use this reset code within 15 minutes.',
+    resetCode
+  });
+}
+
+export async function resetPassword(req, res) {
+  const { email, code, password } = req.body;
+  if (!email || !code || !password) {
+    return res.status(400).json({ message: 'Email, reset code and new password are required.' });
+  }
+  if (password.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters.' });
+
+  const user = await findUserByEmail(email);
+  if (!user || !user.resetCodeHash || !user.resetCodeExpiresAt) {
+    return res.status(400).json({ message: 'Invalid or expired reset code.' });
+  }
+  if (new Date(user.resetCodeExpiresAt).getTime() < Date.now()) {
+    return res.status(400).json({ message: 'Reset code expired. Request a new code.' });
+  }
+  if (!(await bcrypt.compare(String(code), user.resetCodeHash))) {
+    return res.status(400).json({ message: 'Invalid reset code.' });
+  }
+
+  await updateUser(user.id, {
+    password: await bcrypt.hash(password, 10),
+    resetCodeHash: '',
+    resetCodeExpiresAt: ''
+  });
+
+  res.json({ message: 'Password updated successfully. You can now sign in.' });
 }
 
 export async function me(req, res) {

@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema({
   branch: { type: String, default: 'Computer Science' },
   semester: { type: String, default: '4' },
   bio: { type: String, default: 'I use StudyVault to organize and share academic resources.' },
+  resetCodeHash: { type: String, default: '' },
+  resetCodeExpiresAt: { type: String, default: '' },
   createdAt: { type: String, required: true }
 });
 
