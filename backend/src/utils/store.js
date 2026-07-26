@@ -2,6 +2,7 @@ import { readDB, writeDB } from './db.js';
 import { connectMongo, hasMongo, toPlain } from './mongo.js';
 import { User } from '../models/User.js';
 import { Resource } from '../models/Resource.js';
+import { resolveRole } from './admin.js';
 
 function matchesResource(resource, filters) {
   const { q = '', semester = '', subject = '', type = '', branch = '' } = filters;
@@ -62,20 +63,76 @@ export async function updateUser(id, updates) {
   return user;
 }
 
+export async function listUsers() {
+  if (hasMongo) {
+    await connectMongo();
+    return (await User.find({}).sort({ createdAt: -1 })).map(toPlain);
+  }
+
+  const db = await readDB();
+  return db.users.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
+
 export async function listResources(filters, currentUserId) {
   if (hasMongo) {
     await connectMongo();
     const resources = (await Resource.find({}).sort({ createdAt: -1 })).map(toPlain);
     return resources
+      .filter((resource) => resource.status === 'approved' || resource.ownerId === currentUserId)
       .filter((resource) => matchesResource(resource, filters))
-      .map((resource) => ({ ...resource, isOwner: resource.ownerId === currentUserId }));
+      .map((resource) => ({ ...resource, status: resource.status || 'approved', isOwner: resource.ownerId === currentUserId }));
   }
 
   const db = await readDB();
   return db.resources
+    .filter((resource) => (resource.status || 'approved') === 'approved' || resource.ownerId === currentUserId)
     .filter((resource) => matchesResource(resource, filters))
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .map((resource) => ({ ...resource, isOwner: resource.ownerId === currentUserId }));
+    .map((resource) => ({ ...resource, status: resource.status || 'approved', isOwner: resource.ownerId === currentUserId }));
+}
+
+export async function listAllResources() {
+  if (hasMongo) {
+    await connectMongo();
+    return (await Resource.find({}).sort({ createdAt: -1 })).map((resource) => ({
+      ...toPlain(resource),
+      status: resource.status || 'approved'
+    }));
+  }
+
+  const db = await readDB();
+  return db.resources
+    .slice()
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .map((resource) => ({ ...resource, status: resource.status || 'approved' }));
+}
+
+export async function getAdminData() {
+  const users = await listUsers();
+  const resources = await listAllResources();
+  const totalDownloads = resources.reduce((sum, resource) => sum + Number(resource.downloads || 0), 0);
+  const cloudFiles = resources.filter((resource) => resource.storageProvider === 'cloudinary').length;
+  const localFiles = resources.filter((resource) => resource.storageProvider !== 'cloudinary').length;
+  const pending = resources.filter((resource) => resource.status === 'pending').length;
+  const approved = resources.filter((resource) => resource.status === 'approved').length;
+  const rejected = resources.filter((resource) => resource.status === 'rejected').length;
+  const latestUpload = resources[0] || null;
+
+  return {
+    stats: {
+      users: users.length,
+      resources: resources.length,
+      downloads: totalDownloads,
+      cloudFiles,
+      localFiles,
+      pending,
+      approved,
+      rejected
+    },
+    users: users.map(({ password, ...user }) => ({ ...user, role: resolveRole(user) })),
+    resources,
+    latestUpload
+  };
 }
 
 export async function createResourceRecord(resource) {

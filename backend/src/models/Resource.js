@@ -18,6 +18,10 @@ const resourceSchema = new mongoose.Schema({
   resourceType: { type: String, default: '' },
   ownerId: { type: String, required: true, index: true },
   ownerName: { type: String, required: true },
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending', index: true },
+  reviewNote: { type: String, default: '' },
+  reviewedBy: { type: String, default: '' },
+  reviewedAt: { type: String, default: '' },
   downloads: { type: Number, default: 0 },
   createdAt: { type: String, required: true },
   updatedAt: { type: String, required: true }

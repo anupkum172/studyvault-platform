@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CloudUpload, FileCheck2, X } from 'lucide-react';
+import { CloudUpload, Eye, FileCheck2, FileText, X } from 'lucide-react';
 import api from '../lib/api';
 
 export default function Upload() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     title: '',
@@ -17,10 +18,19 @@ export default function Upload() {
     tags: ''
   });
   const [file, setFile] = useState(null);
+  const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : ''), [file]);
+  const canPreview = file && (file.type.startsWith('image/') || file.type === 'application/pdf');
+
+  useEffect(() => () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+  }, [previewUrl]);
+
+  const fileSize = file ? file.size / (1024 * 1024) : 0;
 
   const submit = async (event) => {
     event.preventDefault();
     setError('');
+    setSuccess('');
     setSubmitting(true);
 
     try {
@@ -28,7 +38,17 @@ export default function Upload() {
       Object.entries(form).forEach(([key, value]) => data.append(key, value));
       data.append('file', file);
       await api.post('/resources', data, { headers: { 'Content-Type': 'multipart/form-data' } });
-      navigate('/resources');
+      setSuccess('Submitted for admin approval. It will appear in the repository after an admin approves it.');
+      setFile(null);
+      setForm({
+        title: '',
+        subject: '',
+        semester: '4',
+        branch: 'Computer Science',
+        type: 'notes',
+        description: '',
+        tags: ''
+      });
     } catch (err) {
       if (err.code === 'ECONNABORTED') {
         setError('Upload timed out. Try a smaller file, or check Cloudinary and Vercel function logs.');
@@ -56,6 +76,7 @@ export default function Upload() {
       <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <section className="card space-y-5 p-5 md:p-6">
           {error && <p className="rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>}
+          {success && <p className="rounded-lg bg-teal-50 p-3 text-sm font-semibold text-teal-700">{success}</p>}
 
           <div>
             <p className="muted-label mb-3">Resource Details</p>
@@ -128,14 +149,42 @@ export default function Upload() {
           </label>
 
           {file && (
-            <button type="button" className="btn-secondary mt-3 w-full py-2.5" onClick={() => setFile(null)}>
-              <X size={17} />
-              Remove File
-            </button>
+            <div className="mt-4 space-y-3">
+              <div className="rounded-lg border border-slate-200 bg-white p-3">
+                <div className="flex items-center gap-2 text-sm font-bold text-slate-950">
+                  <Eye size={17} className="text-teal-700" />
+                  Preview before submit
+                </div>
+                <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                  {canPreview ? (
+                    file.type.startsWith('image/') ? (
+                      <img src={previewUrl} alt="Selected file preview" className="max-h-72 w-full object-contain" />
+                    ) : (
+                      <iframe title="Selected PDF preview" src={previewUrl} className="h-72 w-full bg-white" />
+                    )
+                  ) : (
+                    <div className="grid min-h-40 place-items-center p-6 text-center">
+                      <FileText className="mx-auto mb-3 text-slate-500" size={36} />
+                      <p className="font-semibold text-slate-800">Preview is not available for this file type.</p>
+                      <p className="mt-1 text-sm text-slate-500">Check the file name and size before submitting.</p>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 grid gap-2 text-xs text-slate-500">
+                  <p className="break-all"><span className="font-semibold text-slate-700">Name:</span> {file.name}</p>
+                  <p><span className="font-semibold text-slate-700">Size:</span> {fileSize.toFixed(2)} MB</p>
+                  <p><span className="font-semibold text-slate-700">Type:</span> {file.type || 'Unknown'}</p>
+                </div>
+              </div>
+              <button type="button" className="btn-secondary w-full py-2.5" onClick={() => setFile(null)}>
+                <X size={17} />
+                Remove File
+              </button>
+            </div>
           )}
 
-          <button className="btn-primary mt-4 w-full" disabled={submitting}>
-            {submitting ? 'Publishing...' : 'Publish Resource'}
+          <button className="btn-primary mt-4 w-full" disabled={submitting || !file}>
+            {submitting ? 'Submitting...' : 'Submit for Approval'}
           </button>
           <button type="button" onClick={() => navigate('/')} className="btn-secondary mt-3 w-full">
             Cancel

@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true, index: true },
   password: { type: String, required: true },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },
   branch: { type: String, default: 'Computer Science' },
   semester: { type: String, default: '4' },
   bio: { type: String, default: 'I use StudyVault to organize and share academic resources.' },

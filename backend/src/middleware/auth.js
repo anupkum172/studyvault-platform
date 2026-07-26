@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { findUserById } from '../utils/store.js';
+import { resolveRole } from '../utils/admin.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'studyvault_dev_secret_change_me';
 
@@ -16,9 +17,24 @@ export async function protect(req, res, next) {
 
     if (!user) return res.status(401).json({ message: 'User not found.' });
 
-    req.user = { id: user.id, name: user.name, email: user.email, branch: user.branch, semester: user.semester };
+    req.user = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: resolveRole(user),
+      branch: user.branch,
+      semester: user.semester
+    };
     next();
   } catch (error) {
     return res.status(401).json({ message: 'Invalid or expired token.' });
   }
+}
+
+export function requireAdmin(req, res, next) {
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ message: 'Admin access required.' });
+  }
+
+  next();
 }

@@ -7,10 +7,14 @@ A polished full-stack StudyVault project with a modern React frontend and Expres
 - User registration and login
 - JWT authentication
 - Upload academic resources with files
+- Preview selected PDF/image files before submitting upload
+- New uploads wait for admin approval before other students can see them
 - Download uploaded files
 - Search resources by keyword
 - Filter by semester, subject, type, and branch
 - Edit and delete your own uploads
+- Admin section to approve, reject, edit, and delete uploaded resources
+- Admin user overview with upload and download statistics
 - Dashboard with stats
 - User profile update
 - Professional responsive UI
@@ -88,10 +92,11 @@ http://localhost:5273
 1. Register a new account.
 2. Login.
 3. Upload a PDF/image/document resource.
-4. Search and filter resources.
-5. Download files.
-6. Edit/delete your own uploads.
-7. Update profile.
+4. Admin approves the pending upload.
+5. Search and filter approved resources.
+6. Download files.
+7. Edit/delete your own uploads.
+8. Update profile.
 
 ## Environment Variables
 
@@ -101,9 +106,10 @@ Backend already includes `.env.example`. Create `.env` in backend if needed:
 PORT=5000
 JWT_SECRET=studyvault_super_secret_key_change_later
 CLIENT_URL=http://localhost:5273
+ADMIN_EMAILS=admin@example.com
 ```
 
-No MongoDB required.
+No MongoDB required for local development. To make yourself an admin, add your registered email to `ADMIN_EMAILS`. Multiple admins can be comma-separated, for example `ADMIN_EMAILS=first@example.com,second@example.com`.
 
 ## Deploy on Vercel
 
@@ -122,6 +128,7 @@ For production deployment, set these environment variables in Vercel:
 JWT_SECRET=use_a_long_random_secret
 MONGODB_URI=mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/studyvault
 MONGODB_DB=studyvault
+ADMIN_EMAILS=your-email@example.com
 ```
 
 For persistent file uploads, also add Cloudinary credentials:

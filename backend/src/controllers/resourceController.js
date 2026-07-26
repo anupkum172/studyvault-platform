@@ -57,6 +57,10 @@ export async function createResource(req, res) {
     resourceType: cloudinaryFile?.resource_type || '',
     ownerId: req.user.id,
     ownerName: req.user.name,
+    status: 'pending',
+    reviewNote: '',
+    reviewedBy: '',
+    reviewedAt: '',
     downloads: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -96,6 +100,11 @@ export async function deleteResource(req, res) {
 export async function downloadResource(req, res) {
   const resource = await findResourceById(req.params.id);
   if (!resource) return res.status(404).json({ message: 'Resource not found.' });
+  const status = resource.status || 'approved';
+  const canAccessPrivateResource = resource.ownerId === req.user.id || req.user.role === 'admin';
+  if (status !== 'approved' && !canAccessPrivateResource) {
+    return res.status(403).json({ message: 'This resource is waiting for admin approval.' });
+  }
   await updateResourceRecord(req.params.id, { downloads: resource.downloads + 1 });
   if (resource.fileUrl || resource.publicId) {
     const downloadUrl = getCloudinaryDownloadUrl(resource);

@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
 import { createUser, findUserByEmail, findUserById, updateUser } from '../utils/store.js';
+import { resolveRole } from '../utils/admin.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'studyvault_dev_secret_change_me';
 
@@ -11,7 +12,7 @@ function createToken(id) {
 
 function publicUser(user) {
   const { password, ...safeUser } = user;
-  return safeUser;
+  return { ...safeUser, role: resolveRole(user) };
 }
 
 export async function register(req, res) {
@@ -27,6 +28,7 @@ export async function register(req, res) {
     name,
     email: email.toLowerCase(),
     password: await bcrypt.hash(password, 10),
+    role: 'user',
     branch,
     semester,
     bio: 'I use StudyVault to organize and share academic resources.',

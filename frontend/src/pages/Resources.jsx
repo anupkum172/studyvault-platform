@@ -9,6 +9,12 @@ const typeOptions = [
   ['guide', 'Study Guide']
 ];
 
+const statusStyles = {
+  pending: 'bg-amber-50 text-amber-800 ring-amber-100',
+  approved: 'bg-teal-50 text-teal-800 ring-teal-100',
+  rejected: 'bg-red-50 text-red-800 ring-red-100'
+};
+
 export default function Resources() {
   const [items, setItems] = useState([]);
   const [filters, setFilters] = useState({ q: '', semester: '', subject: '', type: '', branch: '' });
@@ -149,7 +155,14 @@ export default function Resources() {
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-700">
                 <FileText size={21} />
               </div>
-              <span className="badge capitalize">{resource.type}</span>
+              <div className="flex flex-wrap justify-end gap-2">
+                <span className="badge capitalize">{resource.type}</span>
+                {resource.isOwner && resource.status !== 'approved' && (
+                  <span className={`badge capitalize ${statusStyles[resource.status] || statusStyles.pending}`}>
+                    {resource.status}
+                  </span>
+                )}
+              </div>
             </div>
 
             <h2 className="text-lg font-bold leading-6 text-slate-950">{resource.title}</h2>
@@ -165,6 +178,17 @@ export default function Resources() {
               <span className="rounded-md bg-slate-100 px-2.5 py-1">{resource.downloads} downloads</span>
               <span className="rounded-md bg-slate-100 px-2.5 py-1">by {resource.ownerName}</span>
             </div>
+
+            {resource.isOwner && resource.status === 'pending' && (
+              <p className="mt-3 rounded-lg bg-amber-50 p-2 text-xs font-semibold text-amber-800">
+                Waiting for admin approval. Other students cannot see it yet.
+              </p>
+            )}
+            {resource.isOwner && resource.status === 'rejected' && (
+              <p className="mt-3 rounded-lg bg-red-50 p-2 text-xs font-semibold text-red-700">
+                Rejected by admin. Edit the details or delete this upload.
+              </p>
+            )}
 
             <div className="mt-5 flex gap-2">
               <button type="button" className="btn-primary flex-1 py-2.5" onClick={() => download(resource)}>

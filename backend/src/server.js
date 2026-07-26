@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import fs from 'fs/promises';
 import authRoutes from './routes/authRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 import resourceRoutes from './routes/resourceRoutes.js';
 import { ensureDB } from './utils/db.js';
 import { uploadDir } from './utils/paths.js';
@@ -66,6 +67,7 @@ app.get('/api/health', async (_req, res) => {
   }
 });
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/resources', resourceRoutes);
 
 app.use((err, _req, res, _next) => {

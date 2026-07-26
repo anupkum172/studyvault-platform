@@ -1,14 +1,16 @@
-import { NavLink, Route, Routes } from 'react-router-dom';
+import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
 import React from 'react';
 import {
   BookOpen,
   LayoutDashboard,
   LogOut,
   Search,
+  ShieldCheck,
   UploadCloud,
   UserCircle
 } from 'lucide-react';
 import { useAuth } from '../main';
+import Admin from './Admin';
 import Dashboard from './Dashboard';
 import Resources from './Resources';
 import Upload from './Upload';
@@ -18,7 +20,8 @@ const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/resources', icon: Search, label: 'Resources' },
   { to: '/upload', icon: UploadCloud, label: 'Upload' },
-  { to: '/profile', icon: UserCircle, label: 'Profile' }
+  { to: '/profile', icon: UserCircle, label: 'Profile' },
+  { to: '/admin', icon: ShieldCheck, label: 'Admin', adminOnly: true }
 ];
 
 function BrandMark() {
@@ -61,6 +64,7 @@ function NavItem({ item, compact = false }) {
 
 export default function AppShell() {
   const { user, logout } = useAuth();
+  const visibleNavItems = navItems.filter((item) => !item.adminOnly || user?.role === 'admin');
 
   return (
     <div className="min-h-screen bg-[#f6f7fb]">
@@ -68,7 +72,7 @@ export default function AppShell() {
         <BrandMark />
 
         <nav className="mt-8 flex-1 space-y-1.5">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <NavItem key={item.to} item={item} />
           ))}
         </nav>
@@ -94,8 +98,8 @@ export default function AppShell() {
             <LogOut size={20} />
           </button>
         </div>
-        <nav className="mt-3 grid grid-cols-4 gap-2">
-          {navItems.map((item) => (
+        <nav className="mt-3 grid gap-2" style={{ gridTemplateColumns: `repeat(${visibleNavItems.length}, minmax(0, 1fr))` }}>
+          {visibleNavItems.map((item) => (
             <NavItem key={item.to} item={item} compact />
           ))}
         </nav>
@@ -108,6 +112,7 @@ export default function AppShell() {
             <Route path="/resources" element={<Resources />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/admin" element={user?.role === 'admin' ? <Admin /> : <Navigate to="/" replace />} />
           </Routes>
         </div>
       </main>
