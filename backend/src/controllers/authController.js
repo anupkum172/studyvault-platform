@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
 import { createUser, findUserByEmail, findUserById, updateUser } from '../utils/store.js';
 import { resolveRole } from '../utils/admin.js';
+import { hasEmailProvider, sendPasswordResetEmail } from '../utils/email.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'studyvault_dev_secret_change_me';
 
@@ -59,7 +60,13 @@ export async function requestPasswordReset(req, res) {
 
   const user = await findUserByEmail(email);
   if (!user) {
-    return res.json({ message: 'If this email exists, a reset code has been generated.' });
+    return res.json({ message: 'If this email exists, a verification code has been sent.' });
+  }
+
+  if (!hasEmailProvider && process.env.VERCEL) {
+    return res.status(503).json({
+      message: 'Email password reset is not configured. Add RESEND_API_KEY and EMAIL_FROM in Vercel.'
+    });
   }
 
   const resetCode = createResetCode();
@@ -68,9 +75,14 @@ export async function requestPasswordReset(req, res) {
     resetCodeExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString()
   });
 
-  res.json({
-    message: 'Use this reset code within 15 minutes.',
-    resetCode
+  if (hasEmailProvider) {
+    await sendPasswordResetEmail({ to: user.email, name: user.name, code: resetCode });
+    return res.json({ message: 'A verification code has been sent to your email. It expires in 15 minutes.' });
+  }
+
+  return res.json({
+    message: 'Development mode: use this verification code within 15 minutes.',
+    devResetCode: resetCode
   });
 }
 

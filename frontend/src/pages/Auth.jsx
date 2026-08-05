@@ -16,7 +16,7 @@ export default function Auth() {
   const [mode, setMode] = useState('login');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
-  const [resetCode, setResetCode] = useState('');
+  const [devResetCode, setDevResetCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
@@ -44,8 +44,8 @@ export default function Auth() {
         navigate('/');
       } else if (mode === 'forgot') {
         const response = await api.post('/auth/forgot-password', { email: form.email });
-        setResetCode(response.data.resetCode || '');
-        setNotice(response.data.message || 'Reset code generated.');
+        setDevResetCode(response.data.devResetCode || '');
+        setNotice(response.data.message || 'Check your email for the verification code.');
         setMode('reset');
       } else if (mode === 'reset') {
         const response = await api.post('/auth/reset-password', {
@@ -54,7 +54,7 @@ export default function Auth() {
           password: form.password
         });
         setNotice(response.data.message || 'Password updated successfully.');
-        setResetCode('');
+        setDevResetCode('');
         setMode('login');
         setForm({ ...form, password: '', resetCode: '' });
       }
@@ -112,7 +112,7 @@ export default function Auth() {
                 {mode === 'login' && 'Welcome back'}
                 {mode === 'register' && 'Create your account'}
                 {mode === 'forgot' && 'Reset your password'}
-                {mode === 'reset' && 'Enter reset code'}
+                {mode === 'reset' && 'Verify your email'}
               </h2>
               <p className="mt-1 text-sm text-slate-500">
                 {mode === 'forgot' || mode === 'reset' ? 'Recover access to your academic vault.' : 'Access your academic vault.'}
@@ -122,14 +122,14 @@ export default function Auth() {
             <div className="mb-5 grid grid-cols-2 rounded-lg bg-slate-100 p-1">
               <button
                 type="button"
-                onClick={() => { setMode('login'); setError(''); setNotice(''); setResetCode(''); }}
+                onClick={() => { setMode('login'); setError(''); setNotice(''); setDevResetCode(''); }}
                 className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'login' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}
               >
                 Login
               </button>
               <button
                 type="button"
-                onClick={() => { setMode('register'); setError(''); setNotice(''); setResetCode(''); }}
+                onClick={() => { setMode('register'); setError(''); setNotice(''); setDevResetCode(''); }}
                 className={`rounded-md py-2 text-sm font-semibold transition ${mode === 'register' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500'}`}
               >
                 Register
@@ -138,10 +138,10 @@ export default function Auth() {
 
             {error && <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>}
             {notice && <p className="mb-4 rounded-lg bg-teal-50 p-3 text-sm font-semibold text-teal-700">{notice}</p>}
-            {resetCode && (
+            {devResetCode && (
               <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Demo reset code</p>
-                <p className="mt-1 text-2xl font-bold tracking-widest text-amber-950">{resetCode}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Development verification code</p>
+                <p className="mt-1 text-2xl font-bold tracking-widest text-amber-950">{devResetCode}</p>
               </div>
             )}
 
@@ -175,7 +175,7 @@ export default function Auth() {
                   <input
                     className="input-icon"
                     required
-                    placeholder="6-digit reset code"
+                    placeholder="Email verification code"
                     value={form.resetCode || ''}
                     onChange={(event) => setForm({ ...form, resetCode: event.target.value })}
                   />
@@ -221,17 +221,17 @@ export default function Auth() {
               <button className="btn-primary w-full" disabled={submitting}>
                 {submitting && mode === 'login' && 'Signing in...'}
                 {submitting && mode === 'register' && 'Creating account...'}
-                {submitting && mode === 'forgot' && 'Generating code...'}
+                {submitting && mode === 'forgot' && 'Sending code...'}
                 {submitting && mode === 'reset' && 'Updating password...'}
                 {!submitting && mode === 'login' && 'Sign In'}
                 {!submitting && mode === 'register' && 'Create Account'}
-                {!submitting && mode === 'forgot' && 'Get Reset Code'}
-                {!submitting && mode === 'reset' && 'Update Password'}
+                {!submitting && mode === 'forgot' && 'Send Verification Code'}
+                {!submitting && mode === 'reset' && 'Verify and Update Password'}
               </button>
               {mode === 'login' && (
                 <button
                   type="button"
-                  onClick={() => { setMode('forgot'); setError(''); setNotice(''); setResetCode(''); }}
+                  onClick={() => { setMode('forgot'); setError(''); setNotice(''); setDevResetCode(''); }}
                   className="w-full text-center text-sm font-semibold text-teal-700 hover:text-teal-800"
                 >
                   Forgot password?
@@ -240,7 +240,7 @@ export default function Auth() {
               {(mode === 'forgot' || mode === 'reset') && (
                 <button
                   type="button"
-                  onClick={() => { setMode('login'); setError(''); setNotice(''); setResetCode(''); }}
+                  onClick={() => { setMode('login'); setError(''); setNotice(''); setDevResetCode(''); }}
                   className="btn-secondary w-full"
                 >
                   Back to Login

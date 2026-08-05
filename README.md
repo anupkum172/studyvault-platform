@@ -5,7 +5,7 @@ A polished full-stack StudyVault project with a modern React frontend and Expres
 ## Features
 
 - User registration and login
-- Forgot password flow with temporary reset code
+- Forgot password flow with email verification code
 - JWT authentication
 - Upload academic resources with files
 - Preview selected PDF/image files before submitting upload
@@ -109,9 +109,13 @@ PORT=5000
 JWT_SECRET=studyvault_super_secret_key_change_later
 CLIENT_URL=http://localhost:5273
 ADMIN_EMAILS=admin@example.com
+RESEND_API_KEY=your_resend_api_key
+EMAIL_FROM=StudyVault Pro <onboarding@resend.dev>
 ```
 
 No MongoDB required for local development. To make yourself an admin, add your registered email to `ADMIN_EMAILS`. Multiple admins can be comma-separated, for example `ADMIN_EMAILS=first@example.com,second@example.com`.
+
+For production password reset emails, create a Resend account and add `RESEND_API_KEY` plus `EMAIL_FROM`. In local development, if email is not configured, the reset page can still show a development verification code for testing.
 
 ## Deploy on Vercel
 
@@ -131,6 +135,8 @@ JWT_SECRET=use_a_long_random_secret
 MONGODB_URI=mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/studyvault
 MONGODB_DB=studyvault
 ADMIN_EMAILS=your-email@example.com
+RESEND_API_KEY=your_resend_api_key
+EMAIL_FROM=StudyVault Pro <onboarding@resend.dev>
 ```
 
 For persistent file uploads, also add Cloudinary credentials:
