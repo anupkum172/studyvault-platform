@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { BookOpen, FileSearch, KeyRound, Lock, Mail, UploadCloud, User } from 'lucide-react';
+import { BookOpen, Eye, EyeOff, FileSearch, KeyRound, Lock, Mail, UploadCloud, User } from 'lucide-react';
 import { useAuth } from '../main';
 import api from '../lib/api';
 
@@ -17,6 +17,7 @@ export default function Auth() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [resetCode, setResetCode] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: '',
@@ -184,13 +185,22 @@ export default function Auth() {
                 <label className="relative block">
                   <Lock className="pointer-events-none absolute left-3.5 top-3.5 text-slate-400" size={18} />
                   <input
-                    className="input-icon"
-                    type="password"
+                    className="input-icon pr-12"
+                    type={showPassword ? 'text' : 'password'}
                     required
                     placeholder={mode === 'reset' ? 'New password, minimum 6 characters' : 'Password, minimum 6 characters'}
                     value={form.password}
                     onChange={(event) => setForm({ ...form, password: event.target.value })}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((value) => !value)}
+                    className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </label>
               )}
               {mode === 'register' && (
