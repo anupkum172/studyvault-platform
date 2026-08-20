@@ -7,6 +7,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import resourceRoutes from './routes/resourceRoutes.js';
 import { ensureDB } from './utils/db.js';
 import { uploadDir } from './utils/paths.js';
+import { hasAISummaryProvider } from './utils/aiSummary.js';
 import { connectMongo, hasMongo } from './utils/mongo.js';
 
 dotenv.config();
@@ -50,7 +51,8 @@ app.get('/api/health', async (_req, res) => {
       ok: true,
       storage: 'local-json',
       database: 'not-configured',
-      uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : (process.env.VERCEL ? 'cloudinary-required' : 'local')
+      uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : (process.env.VERCEL ? 'cloudinary-required' : 'local'),
+      aiSummary: hasAISummaryProvider ? 'configured' : 'not-configured'
     });
   }
 
@@ -60,7 +62,8 @@ app.get('/api/health', async (_req, res) => {
       ok: true,
       storage: 'mongodb',
       database: 'connected',
-      uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : (process.env.VERCEL ? 'cloudinary-required' : 'local')
+      uploads: process.env.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : (process.env.VERCEL ? 'cloudinary-required' : 'local'),
+      aiSummary: hasAISummaryProvider ? 'configured' : 'not-configured'
     });
   } catch (error) {
     return res.status(503).json({ ok: false, storage: 'mongodb', database: 'connection-failed', message: error.message });

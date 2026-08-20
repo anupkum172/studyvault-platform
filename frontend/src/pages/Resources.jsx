@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Download, FileText, Pencil, Search, SlidersHorizontal, Trash2, X } from 'lucide-react';
+import { Download, FileText, Pencil, Search, SlidersHorizontal, Sparkles, Trash2, X } from 'lucide-react';
 import api from '../lib/api';
 
 const typeOptions = [
@@ -172,6 +172,16 @@ export default function Resources() {
             <p className="mt-4 line-clamp-3 flex-1 text-sm leading-6 text-slate-600">
               {resource.description || 'No description added.'}
             </p>
+
+            {resource.aiSummaryStatus === 'ready' && resource.aiSummary && (
+              <div className="mt-4 rounded-lg border border-teal-100 bg-teal-50/70 p-3">
+                <div className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-teal-700">
+                  <Sparkles size={14} />
+                  AI Summary
+                </div>
+                <p className="line-clamp-4 text-sm leading-6 text-slate-700">{resource.aiSummary}</p>
+              </div>
+            )}
 
             <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium text-slate-600">
               <span className="rounded-md bg-slate-100 px-2.5 py-1">{resource.branch}</span>

@@ -6,6 +6,7 @@ import {
   FileText,
   Pencil,
   ShieldCheck,
+  Sparkles,
   Trash2,
   UserRound,
   UsersRound,
@@ -179,6 +180,12 @@ export default function Admin() {
                           <p className="font-bold text-slate-950">{resource.title}</p>
                           <p className="mt-1 text-xs text-slate-500">{resource.originalName}</p>
                           <p className="mt-1 text-xs text-slate-500">{formatSize(resource.fileSize)}</p>
+                          {resource.aiSummaryStatus === 'ready' && resource.aiSummary && (
+                            <p className="mt-2 line-clamp-2 text-xs leading-5 text-teal-700">
+                              <Sparkles className="mr-1 inline" size={13} />
+                              {resource.aiSummary}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </td>

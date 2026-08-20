@@ -10,6 +10,7 @@ A polished full-stack StudyVault project with a modern React frontend and Expres
 - Upload academic resources with files
 - Preview selected PDF/image files before submitting upload
 - New uploads wait for admin approval before other students can see them
+- AI-generated summaries for uploaded academic resources when OpenAI is configured
 - Download uploaded files
 - Search resources by keyword
 - Filter by semester, subject, type, and branch
@@ -111,11 +112,15 @@ CLIENT_URL=http://localhost:5273
 ADMIN_EMAILS=admin@example.com
 RESEND_API_KEY=your_resend_api_key
 EMAIL_FROM=StudyVault Pro <onboarding@resend.dev>
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-5
 ```
 
 No MongoDB required for local development. To make yourself an admin, add your registered email to `ADMIN_EMAILS`. Multiple admins can be comma-separated, for example `ADMIN_EMAILS=first@example.com,second@example.com`.
 
 For production password reset emails, create a Resend account and add `RESEND_API_KEY` plus `EMAIL_FROM`. In local development, if email is not configured, the reset page can still show a development verification code for testing.
+
+For AI summaries, add `OPENAI_API_KEY`. `OPENAI_MODEL` is optional and defaults to `gpt-5`. If the key is not configured, uploads still work but AI summaries are skipped.
 
 ## Deploy on Vercel
 
@@ -137,6 +142,8 @@ MONGODB_DB=studyvault
 ADMIN_EMAILS=your-email@example.com
 RESEND_API_KEY=your_resend_api_key
 EMAIL_FROM=StudyVault Pro <onboarding@resend.dev>
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-5
 ```
 
 For persistent file uploads, also add Cloudinary credentials:

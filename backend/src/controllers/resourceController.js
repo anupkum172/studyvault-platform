@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { nanoid } from 'nanoid';
 import { uploadDir } from '../utils/paths.js';
+import { extractTextPreview, generateAISummary, hasAISummaryProvider } from '../utils/aiSummary.js';
 import { deleteCloudinaryFile, getCloudinaryDownloadUrl, hasCloudinary, uploadBuffer } from '../utils/cloudinary.js';
 import {
   createResourceRecord,
@@ -61,10 +62,26 @@ export async function createResource(req, res) {
     reviewNote: '',
     reviewedBy: '',
     reviewedAt: '',
+    aiSummary: '',
+    aiSummaryStatus: hasAISummaryProvider ? 'pending' : 'not_configured',
+    aiSummarySource: '',
+    aiSummaryGeneratedAt: '',
     downloads: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
+
+  try {
+    Object.assign(resource, await generateAISummary({
+      resource,
+      textPreview: extractTextPreview(req.file)
+    }));
+  } catch (error) {
+    resource.aiSummaryStatus = 'failed';
+    resource.aiSummary = '';
+    resource.aiSummarySource = '';
+    resource.aiSummaryGeneratedAt = '';
+  }
 
   res.status(201).json({ resource: await createResourceRecord(resource) });
 }

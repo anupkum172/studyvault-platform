@@ -38,7 +38,7 @@ export default function Upload() {
       Object.entries(form).forEach(([key, value]) => data.append(key, value));
       data.append('file', file);
       await api.post('/resources', data, { headers: { 'Content-Type': 'multipart/form-data' } });
-      setSuccess('Submitted for admin approval. It will appear in the repository after an admin approves it.');
+      setSuccess('Submitted for admin approval. If AI summaries are enabled, StudyVault will add a summary before it appears in the repository.');
       setFile(null);
       setForm({
         title: '',

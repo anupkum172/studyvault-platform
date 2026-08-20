@@ -22,6 +22,10 @@ const resourceSchema = new mongoose.Schema({
   reviewNote: { type: String, default: '' },
   reviewedBy: { type: String, default: '' },
   reviewedAt: { type: String, default: '' },
+  aiSummary: { type: String, default: '' },
+  aiSummaryStatus: { type: String, enum: ['not_configured', 'pending', 'ready', 'failed'], default: 'not_configured' },
+  aiSummarySource: { type: String, enum: ['metadata', 'document_text', ''], default: '' },
+  aiSummaryGeneratedAt: { type: String, default: '' },
   downloads: { type: Number, default: 0 },
   createdAt: { type: String, required: true },
   updatedAt: { type: String, required: true }
