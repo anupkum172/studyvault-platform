@@ -1,16 +1,6 @@
 # 📚 StudyVault - Product Requirements Document (PRD)
 
-## 👥 Team Information
 
-**Team Name:** The G.O.A.T
-
-### Team Members
-- Anup Kumar Yadav
-- Nitish Yadav
-- Tej Pratap Yadav
-- Mohit Kumar
-
----
 
 # 1. Executive Summary
 
